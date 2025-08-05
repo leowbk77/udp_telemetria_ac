@@ -2,6 +2,8 @@ using System;
 using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
+using System.Collections.Concurrent;
+using System.Text;
 
 namespace AssettoTelemetry.Networking
 {
@@ -25,9 +27,9 @@ namespace AssettoTelemetry.Networking
 
             while (true)
             {
-                HttpListenerContext context = await _httpListener.AcceptWebSocketAsync();
+                HttpListenerContext context = await _httpListener.GetContextAsync();
 
-                if (context.Request.isWebSocketRequest)
+                if (context.Request.IsWebSocketRequest)
                 {
                     var wsContext = await context.AcceptWebSocketAsync(null);
                     _clients.Add(wsContext.WebSocket);

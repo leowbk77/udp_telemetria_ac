@@ -21,11 +21,11 @@ namespace AssettoTelemetry.Networking
             _host = host;
             _listenPort = 9995;
             _assettoPort = assettoPort;
+            _udpClient = new UdpClient(_listenPort);
         }
 
         public async Task StartAsync()
         {
-            _udpClient = new UdpClient(_listenPort);
             var endPoint = new IPEndPoint(IPAddress.Parse(_host), _assettoPort);
 
             Console.WriteLine($"[Assetto UDP] Escutando na porta {_listenPort}...");
