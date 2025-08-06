@@ -15,13 +15,15 @@ namespace AssettoTelemetry.Networking
         private readonly int _listenPort;
         private readonly int _assettoPort;
         private UdpClient _udpClient;
+        private WebSocketServer _webSocketServer;
 
-        public UdpTelemetryClient(string host, int assettoPort)
+        public UdpTelemetryClient(string host, int assettoPort, WebSocketServer webSocketServer)
         {
             _host = host;
             _listenPort = 9995;
             _assettoPort = assettoPort;
             _udpClient = new UdpClient(_listenPort);
+            _webSocketServer = webSocketServer;
         }
 
         public async Task StartAsync()
@@ -49,7 +51,8 @@ namespace AssettoTelemetry.Networking
                 {
                     var data = (await _udpClient.ReceiveAsync()).Buffer;
                     float rpm = BitConverter.ToSingle(data.Skip(68).Take(4).ToArray(), 0);
-                    Console.WriteLine($"RPM: {rpm}");
+                    _ = Task.Run(() => _webSocketServer.SendDataAsync($"{{ \"rpm\": {rpm} }}")); // pode criar muitas threads? https://learn.microsoft.com/pt-br/dotnet/core/extensions/channels
+                    //Console.WriteLine($"RPM: {rpm}");
                 }
                 
             }
